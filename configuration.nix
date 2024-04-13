@@ -47,9 +47,32 @@
   #services.xserver.enable = true;
 
   # Enable the Hyprland Desktop Environment.
-  programs.hyprland.enable = true;
-  environment.sessionVariables.NIXOS_OZONE_WL = "1";
-  environment.sessionVariables.WLR_NO_HARDWARE_CURSORS = "1";
+  programs.hyprland = {
+    enable = true;
+    xwayland.hidpi = true;
+    xwayland.enable = true;
+  };
+  environment.sessionVariables = {
+    NIXOS_OZONE_WL = "1";
+    WLR_NO_HARDWARE_CURSORS = "1";
+  };
+  # Screen Sharing
+  services.dbus.enable = true;
+  xdg.portal = {
+    enable = true;
+    wlr.enable = true;
+    extraPortals = [
+      pkgs.xdg-desktop-portal-gtk
+    ];
+  };
+  # fix a bug in waybar
+  nixpkgs.overlays = [
+    (self: super: {
+      waybar = super.waybar.overrideAttrs (oldAttrs: {
+        mesonFlags = oldAttrs.mesonFlags ++ [ "-Dexperimental=true" ];
+      });
+    })
+  ];
 
   # Enable the GNOME Desktop Environment.
   #services.xserver.displayManager.gdm.enable = true;
@@ -154,18 +177,48 @@
   atuin # shell history db
   bottom # system monitor
   # DESKTOP ENVIRONMENT
-  qt6.qtwayland
-  swaylock-effects
-  swayidle
-  hyprpicker
-  pyprland
-  rofi-wayland
-  swww
-  waybar
+  #qt6.qtwayland
+  #swaylock-effects
+  #swayidle
+  #hyprpicker
+  #pyprland
+  rofi-wayland # app launcher
+  dunst # notificatoin daemon
+  #libnotify #notificaton daemon
+  swww # for wallpapers
+  #waybar
   #wayland
+  xdg-desktop-portal-gtk
+  xdg-desktop-portal-hyprland
   hyprland
+  xwayland
+  meson
+  wayland-protocols
+  wayland-utils
+  wl-clipboard
+  wlroots
   ];
-
+  # bash script named "start.sh" inside .config/hypr/
+  # ```bash
+  # #!/usr/bin/env bash
+  #
+  # # initialize wallpaper daemon
+  # swww init &
+  # # set wallpaper
+  # swww img ~/path/to/file.png &
+  #
+  # # networking
+  # nm-applet --indicator &
+  #
+  # waybar &
+  # dunst
+  # ``` end of script "start.sh"
+  # exec-once=bash ~/.config/hypr/start.sh # at end of hyprland.conf
+  # help from https://josiahalenbrown.substack.com/p/installing-nixos-with-hyprland
+  fonts.fonts = with pkgs; [
+    nerdfonts
+    meslo-lgs-nf
+  ];
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;

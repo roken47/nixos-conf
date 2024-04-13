@@ -42,13 +42,18 @@
     LC_TELEPHONE = "en_US.UTF-8";
     LC_TIME = "en_US.UTF-8";
   };
-
+  # Enable the Wayland windowing system.
   # Enable the X11 windowing system.
-  services.xserver.enable = true;
+  #services.xserver.enable = true;
+
+  # Enable the Hyprland Desktop Environment.
+  programs.hyprland.enable = true;
+  environment.sessionVariables.NIXOS_OZONE_WL = "1";
+  environment.sessionVariables.WLR_NO_HARDWARE_CURSORS = "1";
 
   # Enable the GNOME Desktop Environment.
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
+  #services.xserver.displayManager.gdm.enable = true;
+  #services.xserver.desktopManager.gnome.enable = true;
 
   # Configure keymap in X11
   services.xserver = {
@@ -75,6 +80,10 @@
     # no need to redefine it in your config for now)
     #media-session.enable = true;
   };
+  # enables nix <arg> in cli
+  nix.settings = {
+    experimental-features = [ "nix-command" "flakes" ];    
+  };
 
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
@@ -85,8 +94,25 @@
     description = "Austin de Boer";
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
+      # daily
+      ungoogled-chromium
       firefox
-    #  thunderbird
+      bitwarden
+      bitwarden-cli
+      anytype
+      # media and fun
+      jellyfin-media-player
+      cider
+      pocket-casts
+      steam
+      # development
+      gitui # rust tui for git
+      git
+      alacritty
+      rio # foss rust
+      warp-terminal # closed rust with ai
+      # add user pkgs here
+      # private-internet-access # vpn service doesn't have a package
     ];
   };
 
@@ -105,31 +131,39 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-  stow                   # cli
-  curl                   # cli
-  thefuck                # cli
-  zoxide                 # cli
-  starship               # cli
-  zsh                    # cli
-  nushell                # cli
-  helix                  # cli
-  git                    # cli
-  eza                    # cli
-  wget                   # cli
-  bitwarden              # gui
-  bitwarden-cli          # cli
-  alacritty              # gui
-  github-desktop         # gui
-  jellyfin-media-player  # gui
-  anytype                # gui
-  pocket-casts           # gui
-  cider                  # gui
-  steam                  # gui
-  fortune                # cli
-  bat                    # cli
-  chezmoi                # cli
-  vscode                 # gui
-   # private-internet-access # vpn service doesn't have a package
+  # CORE CLI
+  zellij # to try out tmux alternative
+  curl
+  thefuck # command corrector, not needed with Warp
+  zoxide # better cd
+  starship # PS1 customizer
+  zsh # POSIX shell spin off of BASH
+  nushell # shell non POSIX built on rust
+  helix # modern text editor built on rust
+  eza # better ls
+  wget
+  cowsay # pass text to an animal
+  lolcat # colorize output
+  fortune # fun quotes
+  bat # better cat
+  chezmoi # manage my dotfiles
+  fzf # fuzzy finder
+  fd # find replacement
+  ripgrep # better grep
+  tailspin # make logs human readable
+  atuin # shell history db
+  bottom # system monitor
+  # DESKTOP ENVIRONMENT
+  qt6.qtwayland
+  swaylock-effects
+  swayidle
+  hyprpicker
+  pyprland
+  rofi-wayland
+  swww
+  waybar
+  #wayland
+  hyprland
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
